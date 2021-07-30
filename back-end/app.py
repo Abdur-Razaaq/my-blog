@@ -4,6 +4,7 @@ import datetime
 
 from flask import Flask, request, jsonify
 from flask_jwt import JWT, jwt_required, current_identity
+from flask_cors import CORS
 
 
 class User(object):
@@ -27,6 +28,7 @@ def fetch_users():
 
 
 users = fetch_users()
+
 
 def init_user_table():
     conn = sqlite3.connect('blog.db')
@@ -71,13 +73,16 @@ def identity(payload):
 app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'super-secret'
+CORS(app)
 
 jwt = JWT(app, authenticate, identity)
+
 
 @app.route('/protected')
 @jwt_required()
 def protected():
     return '%s' % current_identity
+
 
 @app.route('/user-registration/', methods=["POST"])
 def user_registration():
